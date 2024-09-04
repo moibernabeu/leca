@@ -1,0 +1,11 @@
+.snakemake/
+*.yaml
+*.smk
+data/
+deprecated/
+jobs/
+outputs/
+paper/
+tests/
+__pycache__
+.Rhistory
