@@ -9,7 +9,7 @@ theme_set(theme_bw())
 
 db <- 'TOLDBA'
 
-dat <- read.csv(paste0('../outputs/taxonomic_bootstrap/', db, '.tsv'), sep = '\t')
+dat <- read.csv(paste0('../outputs/taxonomic_bootstrap/', db), sep = '\t')
 
 a <- dat %>%
   filter(ML_donor == 'Alphaproteobacteria', gamma > 0) %>%
@@ -42,7 +42,4 @@ d <- dat %>%
 a + b + c + d +
   plot_annotation(tag_levels = 'a', theme = theme(text = element_text(face = 'bold')))
 
-
 orig <- read.csv(paste0('../outputs/mLECA_origins/', db, '_stats.tsv'), sep = '\t')
-
-
