@@ -6,7 +6,7 @@ KOs <- c()
 COGs <- c()
 origins <- c()
 for (db in dbs) {
-  ddat <- read.csv(paste0('../outputs/LECA_proteomes_vircleaned/', db, '_3sg_proteome.tsv'), sep = '\t')
+  ddat <- read.csv(paste0('../outputs/LECA_proteomes/', db, '_3sg_proteome.tsv'), sep = '\t')
   dKOs <- ddat %>%
     select(KO = LECA_KOs, db, supergroups) %>%
     separate_longer_delim(KO, ';')
@@ -38,7 +38,7 @@ to_keep <- KOs %>%
 metaprot <- data.frame(gene_id = paste('LECA_', 1:length(to_keep$KO), sep = ''),
                        enzyme_accession = to_keep$KO, source = 'KOfam')
 
-# write.table(metaprot, file = '../outputs/LECA_proteomes_vircleaned/metaproteome.tsv', sep = '\t', quote = FALSE, row.names = FALSE)
+# write.table(metaprot, file = '../outputs/LECA_proteomes/metaproteome.tsv', sep = '\t', quote = FALSE, row.names = FALSE)
 
 COGs <- COGs %>%
   group_by(db, COG) %>%
@@ -55,9 +55,9 @@ to_keep <- COGs %>%
 metaprot_COGs <- data.frame(gene_id = paste('LECA_', 1:length(to_keep$COG), sep = ''),
                             enzyme_accession = to_keep$COG)
 
-# write.table(metaprot_COGs, file = '../outputs/LECA_proteomes_vircleaned/metaproteome_COGs.tsv', sep = '\t', quote = FALSE)
+# write.table(metaprot_COGs, file = '../outputs/LECA_proteomes/metaproteome_COGs.tsv', sep = '\t', quote = FALSE)
 
-main_donors <- read.csv('../outputs/mLECA_origins_vircleaned/selected_groups.csv', sep = '\t')[, 2]
+main_donors <- read.csv('../outputs/LECA_proteomes/selected_groups.tsv', sep = '\t')[, 2]
 defs <- read.csv('../data/KO_description.tsv', sep = '\t')
 
 KO_origins <- origins %>%
@@ -72,17 +72,17 @@ KO_origins <- origins %>%
   filter(!is.na(KO)) %>%
   left_join(defs, by = c('KO' = 'ko'))
 
-write.table(KO_origins, '../outputs/LECA_proteomes_vircleaned/metaproteome_KOs_origin.tsv', sep = '\t', quote = FALSE, row.names = FALSE)
+write.table(KO_origins, '../outputs/LECA_proteomes/metaproteome_KOs_origin.tsv', sep = '\t', quote = FALSE, row.names = FALSE)
 
-cat('', file = '../outputs/metabolism_vircleaned/donor_KEGG_mapper.tsv', append = F)
+cat('', file = '../outputs/metabolism/donor_KEGG_mapper.tsv', append = F)
 for (i in unique(KO_origins$donor)) {
-  cat(paste0('# ', i, '\n'), file = '../outputs/metabolism_vircleaned/donor_KEGG_mapper.tsv', append = T)
+  cat(paste0('# ', i, '\n'), file = '../outputs/metabolism/donor_KEGG_mapper.tsv', append = T)
   donKOs <- KO_origins %>%
     filter(donor == i) %>%
     na.omit()
   donKOs <- unique(donKOs$KO)
   cat(paste(paste(i, 1:length(donKOs), sep = '_'), donKOs, sep = "\t"), sep = '\n',
-      file = '../outputs/metabolism_vircleaned/donor_KEGG_mapper.tsv', append = T)
+      file = '../outputs/metabolism/donor_KEGG_mapper.tsv', append = T)
 }
 
 KO_domains <- origins %>%
@@ -95,15 +95,15 @@ KO_domains <- origins %>%
   filter(!is.na(KO)) %>%
   left_join(defs, by = c('KO' = 'ko'))
 
-write.table(KO_origins, '../outputs/LECA_proteomes_vircleaned/metaproteome_KOs_origin_domain.tsv', sep = '\t', quote = FALSE, row.names = FALSE)
+write.table(KO_origins, '../outputs/LECA_proteomes/metaproteome_KOs_origin_domain.tsv', sep = '\t', quote = FALSE, row.names = FALSE)
 
-cat('', file = '../outputs/metabolism_vircleaned/donor_domain_KEGG_mapper.tsv', append = F)
+cat('', file = '../outputs/metabolism/donor_domain_KEGG_mapper.tsv', append = F)
 for (i in unique(KO_domains$donor_domain)) {
-  cat(paste0('# ', i, '\n'), file = '../outputs/metabolism_vircleaned/donor_domain_KEGG_mapper.tsv', append = T)
+  cat(paste0('# ', i, '\n'), file = '../outputs/metabolism/donor_domain_KEGG_mapper.tsv', append = T)
   donKOs <- KO_domains %>%
     filter(donor_domain == i) %>%
     na.omit()
   donKOs <- unique(donKOs$KO)
   cat(paste(paste(i, 1:length(donKOs), sep = '_'), donKOs, sep = "\t"), sep = '\n',
-      file = '../outputs/metabolism_vircleaned/donor_domain_KEGG_mapper.tsv', append = T)
+      file = '../outputs/metabolism/donor_domain_KEGG_mapper.tsv', append = T)
 }

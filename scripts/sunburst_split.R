@@ -8,7 +8,7 @@ library(plotly)
 dat <- c()
 for (db in c('TOLDBA', 'TOLDBB', 'TOLDBC')) {
   for (sg in c(3, 5)) {
-    fdat <- read.csv(paste0('../outputs/LECA_proteomes_vircleaned/', db, '_', sg, 'sg_proteome.tsv'), sep = '\t')
+    fdat <- read.csv(paste0('../outputs/LECA_proteomes/', db, '_', sg, 'sg_proteome.tsv'), sep = '\t')
     fdat <- fdat %>%
       mutate(db = db, criteria = ifelse(sg == 3, 'Relaxed', 'Strict'))
     dat <- rbind(dat, fdat)
@@ -59,7 +59,7 @@ plot_relaxed <- plot_ly(sbdat, ids = ~label, labels = ~label, parents = ~parent,
                         strokes = 'black', stroke = 'black', size = I(6))
 plot_relaxed
 
-save_image(plot_relaxed, file = '../outputs/LECA_proteomes/sunbursnt_consensus_relaxed.pdf')
+save_image(plot_relaxed, file = '../outputs/mLECA_origins_plots/sunbursnt_consensus_relaxed.pdf')
 
 sbdat <- rbind(data.frame(parent = c(''),
                           label = c('LECA'),
@@ -72,7 +72,7 @@ plot_relaxed <- plot_ly(sbdat, ids = ~label, labels = ~label, parents = ~parent,
                        strokes = 'black', stroke = 'black', size = I(16))
 plot_relaxed
 
-save_image(plot_relaxed, file = '../outputs/LECA_proteomes/icicle_consensus_relaxed.pdf')
+save_image(plot_relaxed, file = '../outputs/mLECA_origins_plots/icicle_consensus_relaxed.pdf')
 
 # STRICT
 aa %>%
@@ -106,7 +106,7 @@ plot_strict <- plot_ly(sbdat, ids = ~label, labels = ~label, parents = ~parent, 
                        strokes = 'black', stroke = 'black', size = I(6))
 plot_strict
 
-save_image(plot_strict, file = '../outputs/LECA_proteomes/sunbursnt_consensus_strict.pdf')
+save_image(plot_strict, file = '../outputs/mLECA_origins_plots/sunbursnt_consensus_strict.pdf')
 
 sbdat <- rbind(data.frame(parent = c(''),
                           label = c('LECA'),
@@ -119,9 +119,8 @@ plot_strict <- plot_ly(sbdat, ids = ~label, labels = ~label, parents = ~parent, 
                        strokes = 'black', stroke = 'black', size = I(16))
 plot_strict
 
-save_image(plot_strict, file = '../outputs/LECA_proteomes/icicle_consensus_strict.pdf')
+save_image(plot_strict, file = '../outputs/mLECA_origins_plots//icicle_consensus_strict.pdf')
 save_image(plot_strict, file = '../paper/figures_R/raw_plots/figure_2/icicle_consensus_strict.pdf')
-
 
 aa %>%
   group_by(criteria) %>%

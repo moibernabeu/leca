@@ -10,11 +10,14 @@ library(tidyverse)
 
 theme_set(theme_bw())
 
+colours <- read.csv('../data/colours.tsv', sep = '\t')[, 2]
+names(colours) <- read.csv('../data/colours.tsv', sep = '\t')[, 1]
+
 # niter = 10000
 # thin = 10
 # burnin = 0.1
 # 
-# mcmcfiles <- list.files('../outputs/inference_vircleaned/', recursive = TRUE,
+# mcmcfiles <- list.files('../outputs/inference/', recursive = TRUE,
 #                         pattern = 'gam_mcmc.RData', full.names = TRUE)
 # 
 # mo <- c()
@@ -34,23 +37,24 @@ theme_set(theme_bw())
 #   remove(list = grep(clade, ls(), value = TRUE))
 # }
 # 
-# write.table(mo, file = '../outputs/inference_vircleaned/mode_posteriors.tsv',
+# write.table(mo, file = '../outputs/inference/mode_posteriors.tsv',
 #             sep = '\t', row.names = FALSE, quote = FALSE)
 
 
-mo <- read.csv('../outputs/inference_vircleaned/mode_posteriors.tsv', sep = '\t')
+mo <- read.csv('../outputs/inference/mode_posteriors.tsv', sep = '\t')
 mod <- mo %>%
   filter(var1 != 0)
 
 mod$criterion <- factor(mod$criterion, levels = c('Three supergroups', 'Five supergroups'))
 
-pdf('../outputs/inference_vircleaned/all_waves.pdf', height = 5.5, width = 7)
-ggplot(mod, aes(var1, colour = clade)) +
+pdf('../outputs/inference/all_waves.pdf', height = 5.5, width = 7)
+ggplot(mod %>% filter(clade != 'Thermoproteota'), aes(var1, colour = clade)) +
   geom_density() +
   facet_grid(databse ~ criterion) +
   xlab('Stem length mode') +
   ylab('Posterior density') +
-  labs(colour = 'Donor')
+  labs(colour = 'Donor') +
+  scale_colour_manual(values = colours)
 dev.off()
 
 clades <- unique(mod$clade)
@@ -81,7 +85,29 @@ for (db in dbs) {
   }
 }
 
-pdf('../outputs/inference_vircleaned/prob_heatmap.pdf', width = 8, height = 8)
+for (i in clades) {
+  for (j in clades) {
+    post_diff_mean
+  }
+}
+
+ord <- mod %>%
+  filter(databse == 'TOLDBA', criterion == 'Five supergroups') %>%
+  group_by(clade) %>%
+  summarise(mod = mean(var1)) %>%
+  arrange(-mod)
+ord <- ord$clade
+
+mean_post <- apply(post_diff_mean, c(1, 2), median)[ord, ord]
+diag(mean_post) <- NA
+mean_post[lower.tri(mean_post)] <- NA
+
+pheatmap(mean_post, cluster_rows = FALSE, cluster_cols = FALSE, display_numbers = TRUE,
+         cellwidth = 25, cellheight = 25,
+         color = colorRampPalette(c('white', 'steelblue3'))(100),
+         na_col = 'white')
+
+pdf('../outputs/inference/prob_heatmap.pdf', width = 8, height = 8)
 for (db in dbs) {
   for (crit in crits) {
     ord <- mod %>%
@@ -93,6 +119,7 @@ for (db in dbs) {
     
     m <- post_diff_mean[ord, ord, db, crit]
     m[lower.tri(m)] <- NA
+    diag(m) <- NA
     
     pheatmap(m, cluster_rows = FALSE, cluster_cols = FALSE, display_numbers = TRUE,
              cellwidth = 25, cellheight = 25,

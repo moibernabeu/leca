@@ -2,15 +2,19 @@ library(tidyverse)
 library(ggtree)
 library(treeio)
 
-pal_df <- read.csv('../data/palette.txt', sep = '\t', header = FALSE)
+pal_df <- read.csv('../data/colours.tsv', sep = '\t', header = FALSE)
 pal <- pal_df$V2
 names(pal) <- pal_df$V1
 
 taxonomy <- read.csv('../data/euk_taxonomy_toldb.tsv', sep = '\t')
 
-tr <- read.tree('../outputs/sptree_TOLDBA_lax/concatenate/iqtree/TOLDBA.treefile')
+tr <- read.tree('../outputs/sptree_TOLDBA/concatenate/iqtree_LGG4PMSF/TOLDBA.treefile')
 
-ggtree(root(tr, node = 177)) %<+% taxonomy +
+ggtree(tr) %<+% taxonomy +
+  geom_node_label(aes(label = node)) +
+  geom_tiplab(aes(label = Supergroup, colour = Supergroup), size = 2.5)
+
+ggtree(root(tr, node = 178)) %<+% taxonomy +
   # geom_nodelab(aes(label = node)) +
   geom_tiplab(aes(label = Supergroup, colour = Supergroup), size = 2.5) +
   # geom_nodelab(aes(label = label)) +

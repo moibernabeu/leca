@@ -17,7 +17,7 @@ source('mcmc_analysis.R')
 # Loading data
 dat <- c()
 for (i in c('A', 'B', 'C')) {
-  dat <- rbind(dat, read.csv(paste0('../../outputs/modules_vircleaned/TOLDB', i, '_modules_annotation_filtered.tsv'), sep = '\t'))
+  dat <- rbind(dat, read.csv(paste0('../../outputs/modules/TOLDB', i, '_modules_annotation_filtered.tsv'), sep = '\t'))
 }
 
 # Setting MCMC parameters
@@ -28,7 +28,7 @@ unifmax = 100
 burnin = 0.1
 
 # Setting the output folder
-folder = '../../outputs/inference_vircleaned'
+folder = '../../outputs/inference'
 dir.create(folder, recursive = TRUE)
 
 db <- 'TOLDBA'

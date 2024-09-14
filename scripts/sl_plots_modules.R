@@ -53,23 +53,20 @@ find_module <- function(x) {
   }
 }
 
-to_exclude <- read.csv('../data/list_codes_Nucleocytoviricota.second_sister.3SG.stats', sep = '\t', fill = TRUE, header = FALSE)
-to_exclude <- to_exclude %>%
-  mutate(to_exclude = str_detect(V1, '#'), database = gsub('#', '', V1)) %>%
-  filter(to_exclude)
+to_exclude <- read.csv('../outputs/virus_analysis/excluded.tsv', sep = '\t')
 
-odir <- '../outputs/modules_vircleaned/'
-db <- 'TOLDBA'
+odir <- '../outputs/modules/'
+db <- 'TOLDBC'
 prefix <- paste0(odir, db)
 dir.create(odir)
 
 dat <- read.csv(paste0('../outputs/mLECA_origins/', db, '_stats.tsv'), sep = '\t',
                 tryLogical = TRUE)
-groups <- read.csv('../outputs/mLECA_origins/selected_groups.csv', sep = '\t')[, 2]
+groups <- read.csv('../outputs/LECA_proteomes/selected_groups.tsv', sep = '\t')[, 2]
 
 db_exclude <- to_exclude %>%
   filter(database == db)
-db_exclude <- db_exclude$V2
+db_exclude <- db_exclude[, 2]
 
 # Plotting the stem lengths and calculating the modules ----
 # General filtering for the data
@@ -79,15 +76,11 @@ fdat <- dat %>%
          !paste0(Orthogroup, '_', LECA) %in% db_exclude)
 
 pdf(paste0(prefix, '_stem_lengths_modules.pdf'), width = 8.5, height = 6)
-criteria <- c('Three_supergroups', 'Five_supergroups')
+criteria <- c(3, 5)
 for (criterion in criteria) {
-  if (criterion == 'five_supergroups') {
-    pdat <- fdat %>%
-      filter(Five_supergroups == 'True')
-  } else {
-    pdat <- fdat
-  }
-  
+  pdat <- fdat %>%
+    filter(supergroups >= criterion)
+
   pdat <- pdat %>%
     group_by(donor) %>%
     mutate(label = paste0(donor, ' (', n(), ')'))
@@ -105,7 +98,7 @@ for (criterion in criteria) {
     geom_vline(aes(xintercept = mode), data = modes_sort, colour = 'steelblue') +
     geom_vline(aes(xintercept = first_min), data = modes_sort, colour = 'darkorange3', lty = 4) +
     facet_wrap(~label) +
-    labs(title = paste(db, criterion, sep = ' | '))
+    labs(title = paste0(db, ' | ', criterion, ' supergroups'))
   
   print(p)
 }
@@ -151,6 +144,7 @@ dev.off()
 
 # Plotting module trees ----
 pdf(paste0(prefix, '_trees_in_modules.pdf'), width = 11, height = 7)
+criteria <- c('Three_supergroups', 'Five_supergroups')
 for (crit in criteria) {
   pdat <- modules %>%
     filter(criterion == crit) %>%

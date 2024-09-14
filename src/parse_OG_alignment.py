@@ -69,7 +69,8 @@ def main():
         odfl.append(odfd)
 
     df = pl.DataFrame(odfl)
-    df.write_csv(args.ofile, separator='\t')
+    if args.ofile is not None:
+        df.write_csv(args.ofile, separator='\t')
 
     return 0
 

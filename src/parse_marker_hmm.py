@@ -104,12 +104,13 @@ def main():
     splist = [x.split('\t')[1] for x in open(args.splist, 'r')]
     create_folder(args.seqsdir)
 
-    hmm = read_hmmtab(args.hmmtab, sp_max=1)
+    hmm = read_hmmtab(args.hmmtab, sp_max=args.maxseqs)
     seqs = read_fasta(args.seqsfile, clean=True)
 
     odfl = []
     for marker in hmm:
         summ = hmm_summary(hmm[marker], splist)
+        # Filtering by the species coverage of the found homologs
         if summ['summary']['spcov'] >= 0.8:
             byevalue = [(k, v['evalue']) for k, v in hmm[marker].items()]
             byevalue.sort(key=lambda x: x[1], reverse=False)
@@ -118,6 +119,7 @@ def main():
             oseqs = {}
             ospp = set()
             for seq, evalue in byevalue:
+                # Filtering by the length of the sequences
                 if (len(marker_seqs[seq]) >= 0.5 * median(seq_lens) and
                     len(marker_seqs[seq]) <= 2 * median(seq_lens)):
                     oseqs[seq] = marker_seqs[seq]

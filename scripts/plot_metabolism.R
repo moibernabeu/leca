@@ -56,8 +56,8 @@ add_data <- function(g, mods, summary_function) {
   return(g)
 }
 
-load('../outputs/metabolism/full_graph.RData')
-odir <- '../outputs/metabolism_vircleaned/'
+load('../outputs/old_donors/metabolism/full_graph.RData')
+odir <- '../outputs/metabolism/'
 databases <- c('TOLDBA', 'TOLDBB', 'TOLDBC')
 criteria <- c(3, 5)
 
@@ -74,11 +74,11 @@ for (db in databases) {
   }
 }
 
-donors <- read.csv('../outputs/mLECA_origins_vircleaned/selected_groups.csv', sep = '\t')[, 1]
+donors <- read.csv('../outputs/LECA_proteomes/selected_groups.tsv', sep = '\t')[, 1]
 orig <- c()
 for (db in databases) {
   for (criterion in criteria) {
-    fnm <- paste0('../outputs/LECA_proteomes_vircleaned/', db, '_', criterion, 'sg_proteome.tsv')
+    fnm <- paste0('../outputs/LECA_proteomes/', db, '_', criterion, 'sg_proteome.tsv')
     orig <- rbind(orig, data.frame(database = db, criterion = criterion, read.csv(fnm, sep = '\t')))
   }
 }
@@ -86,7 +86,7 @@ for (db in databases) {
 modules_origin <- c()
 for (i in 1:dim(dat)[1]) {
   module <- dat[i, ] %>%
-    select(module_category, module, module_name, path_KO = enzyme_hits_in_module, database, criterion) %>%
+    select(module_category, module_subcategory, module, module_name, path_KO = enzyme_hits_in_module, database, criterion) %>%
     separate_longer_delim(path_KO, ',')
 
   module <- module %>%
@@ -123,7 +123,7 @@ for (db in databases) {
 }
 
 # Plotting metaproteome
-fdat <- read.csv(paste0(odir, '/metaproteome_modules.txt'), sep = '\t') %>%
+fdat <- read.csv(paste0(odir, '/metaproteome.tsv_modules.txt'), sep = '\t') %>%
   filter(stepwise_module_is_complete == 'True')
 
 mods <- rep(TRUE, length(unique(fdat$module)))
@@ -235,7 +235,7 @@ p
 
 # Plotting the metabolic path according to origin
 origin_summary <- modules_origin %>%
-  group_by(module_category, module, module_name, database, criterion) %>%
+  group_by(module_category, module_subcategory, module, module_name, database, criterion) %>%
   mutate(n_total = n(), orig_domain = ifelse(is.na(donor_domain), origin, donor_domain)) %>%
   group_by(module_category, module, module_name, database, criterion, orig_domain) %>%
   summarise(n = n(), prop = n / unique(n_total), module_origin = ifelse(prop >= 0.6, orig_domain, 'Unknown')) %>%
@@ -243,14 +243,14 @@ origin_summary <- modules_origin %>%
   arrange(-prop)
 
 a <- modules_origin %>%
-  group_by(module_category, module, module_name, database, criterion) %>%
+  group_by(module_category, module_subcategory, module, module_name, database, criterion) %>%
   mutate(n_total = n(), orig_domain = ifelse(is.na(donor_domain), origin, donor_domain),
          major_contributor = ifelse(is.na(donor), origin, donor)) %>%
   ungroup() %>%
-  group_by(module_category, module, module_name, database, criterion, major_contributor) %>%
+  group_by(module_category, module_subcategory, module, module_name, database, criterion, major_contributor) %>%
   summarise(n = n(), prop = n / unique(n_total)) %>%
   ungroup() %>%
-  group_by(module_category, module, module_name, database, criterion) %>%
+  group_by(module_category, module_subcategory, module, module_name, database, criterion) %>%
   slice_max(order_by = prop, n = 1, with_ties = FALSE) %>%
   ungroup() %>%
   mutate(dataset = paste0(database, '_', criterion)) %>%
@@ -258,7 +258,7 @@ a <- modules_origin %>%
   pivot_wider(names_from = dataset, values_from = c(major_contributor, prop, n)) %>%
   arrange(module)
 
-write.table(a, file = '../outputs/metabolism_vircleaned/metabolism_summary_main_donor.tsv',
+write.table(a, file = '../outputs/metabolism/metabolism_summary_main_donor.tsv',
             sep = '\t', quote = FALSE, row.names = FALSE)
 
 toni_origins <- modules_origin %>%
@@ -271,7 +271,7 @@ toni_origins <- modules_origin %>%
 
 toni_origins <- as.data.frame(toni_origins)
 
-write.table(toni_origins, file = '../outputs/metabolism_vircleaned/metabolism_summary_KOs.tsv',
+write.table(toni_origins, file = '../outputs/metabolism/metabolism_summary_KOs.tsv',
             sep = '\t', quote = FALSE, row.names = FALSE)
 
 toni_origins <- modules_origin %>%
@@ -284,7 +284,7 @@ toni_origins <- modules_origin %>%
 
 toni_origins <- as.data.frame(toni_origins)
 
-write.table(toni_origins, file = '../outputs/metabolism_vircleaned/metabolism_summary.tsv',
+write.table(toni_origins, file = '../outputs/metabolism/metabolism_summary.tsv',
             sep = '\t', quote = FALSE, row.names = FALSE)
 
 pdf(paste0(plotsdir, '/total_metabolism_by_donor.pdf'), width = 10, height = 6)

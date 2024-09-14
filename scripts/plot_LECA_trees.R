@@ -43,7 +43,7 @@ annotate_tree <- function(tree, data, get_sp, sp_row=1) {
   return(otree)
 }
 
-trees <- read.csv('../tests/family_origins_sofar/5_leca.nwk', sep = '\t', header = FALSE)
+trees <- read.csv('../outputs/large_ogs/round_1_LECA_trees.nwk', sep = '\t', header = FALSE)
 dat <- read.csv('../data/LECA_project.lng', sep = '\t', header = FALSE)
 
 dat <- dat %>%
@@ -55,9 +55,9 @@ dat <- dat %>%
 cols <- okabeito_colors(1:4)
 names(cols) <- unique(dat$V2_4)
 
-odir <- '../tests/family_origins_sofar/'
+odir <- '../outputs/large_ogs/plots'
 dir.create(odir)
-pdf(paste0(odir, '/five_lecas.pdf'),
+pdf(paste0(odir, '/leca_trees.pdf'),
     width = 8,
     height = 8)
 for (i in 1:dim(trees)[1]) {

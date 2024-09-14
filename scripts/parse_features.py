@@ -3,7 +3,7 @@
 import polars as pl
 
 donors = []
-for line in open('outputs/metabolism_vircleaned/donor_domain_KEGG_mapper_reconstruction.tsv'):
+for line in open('outputs/metabolism/donor_domain_KEGG_mapper_results.txt'):
     leading_sp = len(line) - len(line.lstrip())
     line = line.strip()
     if leading_sp == 0:
@@ -25,4 +25,4 @@ for line in open('outputs/metabolism_vircleaned/donor_domain_KEGG_mapper_reconst
                            'donor_genes': donors_line[1]})
 
 odf = pl.DataFrame(donors)
-odf.write_csv(file='outputs/metabolism_vircleaned/donor_domain_KEGG_donors.tsv', separator='\t')
+odf.write_csv(file='outputs/metabolism/donor_domain_KEGG_donors.tsv', separator='\t')
